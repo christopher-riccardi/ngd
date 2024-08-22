@@ -1,0 +1,40 @@
+import sys
+from collections import Counter
+
+def count_kmers(sequence, k):
+    kmers = Counter()
+    sequence_length = len(sequence)
+    for i in range(sequence_length - k + 1):
+        kmer = sequence[i:i+k]
+        kmers[kmer] = 1
+    return kmers
+
+def calc_NGD(seq1, seq2, k_size):
+    kmer_counts_X = count_kmers(seq1, k_size)
+    sum_WX = len(kmer_counts_X)
+    kmer_counts_Y = count_kmers(seq2, k_size)
+    sum_WY = len(kmer_counts_Y)
+    max_W = max(sum_WX, sum_WY)
+    min_W = min(sum_WX, sum_WY)
+    common_kmers = kmer_counts_X.keys() & kmer_counts_Y.keys()
+    sum_min_W = len(common_kmers)
+    num = max_W - sum_min_W
+    denom = (sum_WX + sum_WY) - min_W
+    if denom == 0:
+        return 1
+    return num / denom
+
+## Usage: sequence 1, sequence2, kmer (optional)
+k_size = 3
+user_k = None
+try:
+  user_k = int(sys.argv[3])
+except:
+  pass
+if user_k:
+  k_size = user_k
+
+seq1 = ''.join([line.rstrip() for line in open(sys.argv[1]) if not line.startswith('>')])
+seq2 = ''.join([line.rstrip() for line in open(sys.argv[2]) if not line.startswith('>')])
+
+print(calc_NGD(seq1, seq2, k_size))
